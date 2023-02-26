@@ -21,8 +21,8 @@ public class Drivetrain extends SubsystemBase {
         m_rightChild.follow(m_rightParent);
         m_leftChild.follow(m_leftParent);
 
-        m_rightParent.configOpenloopRamp(1.5);
-        m_leftParent.configOpenloopRamp(1.5);
+        m_rightParent.configOpenloopRamp(.25);
+        m_leftParent.configOpenloopRamp(.25);
 
         m_rightParent.setInverted(rightInversion);
         m_rightChild.setInverted(rightInversion);
