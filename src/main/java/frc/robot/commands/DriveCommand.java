@@ -23,8 +23,8 @@ public class DriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        double moveSpeed = controller.getRawAxis(1);
-        double rotateSpeed = controller.getRawAxis(2);
+        double moveSpeed = -controller.getRawAxis(1);
+        double rotateSpeed = -controller.getRawAxis(2);
         if (Math.abs(moveSpeed) > Constants.OperatorConstants.kControllerDeadzone || 
             Math.abs(rotateSpeed) > Constants.OperatorConstants.kControllerDeadzone) {
                 drivetrain.arcadeDrive(moveSpeed, rotateSpeed);

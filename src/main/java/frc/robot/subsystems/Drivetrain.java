@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 public class Drivetrain extends SubsystemBase {
@@ -22,8 +21,13 @@ public class Drivetrain extends SubsystemBase {
         m_rightChild.follow(m_rightParent);
         m_leftChild.follow(m_leftParent);
 
+        m_rightParent.configOpenloopRamp(1.5);
+        m_leftParent.configOpenloopRamp(1.5);
+
         m_rightParent.setInverted(rightInversion);
+        m_rightChild.setInverted(rightInversion);
         m_leftParent.setInverted(leftInversion);
+        m_leftChild.setInverted(leftInversion);
 
         differentialDrive = new DifferentialDrive(m_leftParent, m_rightParent);
     }
@@ -43,12 +47,16 @@ public class Drivetrain extends SubsystemBase {
 
     public void setBrakeMode() {
         m_rightParent.setNeutralMode(NeutralMode.Brake);
+        m_rightChild.setNeutralMode(NeutralMode.Brake);
         m_leftParent.setNeutralMode(NeutralMode.Brake);
+        m_leftChild.setNeutralMode(NeutralMode.Brake);
     }
 
     public void setCoastMode() {
         m_rightParent.setNeutralMode(NeutralMode.Coast);
+        m_rightChild.setNeutralMode(NeutralMode.Coast);
         m_leftParent.setNeutralMode(NeutralMode.Coast);
+        m_leftChild.setNeutralMode(NeutralMode.Coast);
     }
 
     public void arcadeDrive(double moveSpeed, double rotateSpeed) {
