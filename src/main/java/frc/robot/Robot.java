@@ -11,7 +11,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         robotContainer = new RobotContainer();
         robotContainer.setCoastMode();
-
+        robotContainer.resetArm();
     }
 
     @Override

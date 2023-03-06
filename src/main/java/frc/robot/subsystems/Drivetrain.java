@@ -10,7 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 public class Drivetrain extends SubsystemBase {
     private WPI_TalonFX m_rightParent, m_leftParent,
                     m_rightChild, m_leftChild;
-    private DifferentialDrive differentialDrive;
+    // private DifferentialDrive differentialDrive;
 
     public Drivetrain(int rightTalonParentID, int leftTalonParentID, int rightTalonChildID, int leftTalonChildID, 
                     boolean rightInversion, boolean leftInversion) {
@@ -21,15 +21,15 @@ public class Drivetrain extends SubsystemBase {
         m_rightChild.follow(m_rightParent);
         m_leftChild.follow(m_leftParent);
 
-        m_rightParent.configOpenloopRamp(.25);
-        m_leftParent.configOpenloopRamp(.25);
+        // m_rightParent.configOpenloopRamp(.25);
+        // m_leftParent.configOpenloopRamp(.25);
 
         m_rightParent.setInverted(rightInversion);
         m_rightChild.setInverted(rightInversion);
         m_leftParent.setInverted(leftInversion);
         m_leftChild.setInverted(leftInversion);
 
-        differentialDrive = new DifferentialDrive(m_leftParent, m_rightParent);
+        // differentialDrive = new DifferentialDrive(m_leftParent, m_rightParent);
     }
 
     public void setPower(double rightPower, double leftPower) {
@@ -60,6 +60,14 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void arcadeDrive(double moveSpeed, double rotateSpeed) {
-        differentialDrive.arcadeDrive(moveSpeed, rotateSpeed);
+        // differentialDrive.arcadeDrive(moveSpeed, rotateSpeed);
+        
+    }
+
+    public void tankDrive(double left, double right) {
+        if (Math.abs(left) > 0.1) left = 0.1 * Math.signum(left);
+        if (Math.abs(right) > 0.1) right = 0.1 * Math.signum(right);
+        setLeftPower(left);
+        setRightPower(right);
     }
 }
