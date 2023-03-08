@@ -16,6 +16,8 @@ public class Drivetrain extends SubsystemBase  {
     private WPI_TalonFX m_rightParent, m_leftParent, m_rightChild, m_leftChild;
     public DifferentialDrive differentialDrive;
 
+    public double maxPower;
+
 
 
 
@@ -51,9 +53,20 @@ public class Drivetrain extends SubsystemBase  {
 
 
 
-    public void speedDrive(double drive, double turn){
+    public void speedDrive(double drive, double turn, int mode){
+        // speed mode: 0 default, 1 speed up, 2 speed down
 
-        double maxPower = 0.5;
+        System.out.println(mode);
+        // maxPower = 1;
+        if (mode == 1){
+            maxPower = 1.0;
+        }else if (mode == 2){
+            maxPower = 0.2;
+        }else{
+            maxPower = 0.6;
+        }
+
+
         double jsDeadBand = Constants.OperatorConstants.kControllerDeadzone;
 
         double drivePower = 0;
@@ -68,6 +81,10 @@ public class Drivetrain extends SubsystemBase  {
 
 
 
+    }
+
+    public void driveStraight(double speed){
+        differentialDrive.tankDrive(-speed, -speed);
     }
 
 

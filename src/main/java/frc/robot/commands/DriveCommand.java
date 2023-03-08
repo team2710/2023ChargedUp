@@ -13,10 +13,14 @@ public class DriveCommand extends CommandBase {
     private final Drivetrain drivetrain;
     private final CommandXboxController controller;
 
-    public DriveCommand(Drivetrain drivetrain, CommandXboxController controller) {
+    private int speedMode;
+
+
+    public DriveCommand(Drivetrain drivetrain, CommandXboxController controller, int speed) {
         this.drivetrain = drivetrain;
         this.controller = controller;
         addRequirements(drivetrain);
+        this.speedMode = speed;
     }
 
     @Override
@@ -34,7 +38,10 @@ public class DriveCommand extends CommandBase {
         double moveSpeed = controller.getRawAxis(1);
         double rotateSpeed = controller.getRawAxis(2);
 
-        drivetrain.speedDrive(moveSpeed, rotateSpeed);
+
+        //0 default, 1 speed up, 2 speed down
+
+        drivetrain.speedDrive(moveSpeed, rotateSpeed, speedMode);
 
 
 

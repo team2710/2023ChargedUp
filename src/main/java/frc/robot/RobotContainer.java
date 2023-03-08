@@ -38,7 +38,7 @@ public class RobotContainer {
         driverController = new CommandXboxController(Constants.OperatorConstants.kDriverControllerPort);
         auxController = new CommandXboxController(Constants.OperatorConstants.kAuxControllerPort);
 
-        drivetrain.setDefaultCommand(new DriveCommand(drivetrain, driverController));
+        drivetrain.setDefaultCommand(new DriveCommand(drivetrain, driverController, 0));
         elevator.setDefaultCommand(new ElevatorCommand(elevator, auxController));
         arm.setDefaultCommand(new ArmCommand(arm, intake, auxController));
 
@@ -55,6 +55,12 @@ public class RobotContainer {
         Trigger xButton = auxController.a();
         aButton.onTrue(new ArmMoveCommand(arm, 4800));
         xButton.onTrue(new ArmMoveCommand(arm, 0));
+
+        Trigger driverLeftBumper = driverController.leftBumper();
+        driverLeftBumper.whileTrue(new DriveCommand(drivetrain, driverController, 1));
+        Trigger driverRightBumper = driverController.rightBumper();
+        driverRightBumper.whileTrue(new DriveCommand(drivetrain, driverController, 2));
+
 
         // Trigger yButton = auxController.x();
         // yButton.onTrue(new ConeIntakeCommand(intake).andThen(new WaitCommand(2)).andThen(new ConeHoldCommand(intake)));
