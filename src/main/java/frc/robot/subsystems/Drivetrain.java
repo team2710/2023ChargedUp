@@ -9,10 +9,15 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-public class Drivetrain extends SubsystemBase {
-    private WPI_TalonFX m_rightParent, m_leftParent,
-                    m_rightChild, m_leftChild;
-    // private DifferentialDrive differentialDrive;
+
+public class Drivetrain extends SubsystemBase  {
+
+    
+    private WPI_TalonFX m_rightParent, m_leftParent, m_rightChild, m_leftChild;
+    public DifferentialDrive differentialDrive;
+
+
+
 
     public Drivetrain(int rightTalonParentID, int leftTalonParentID, int rightTalonChildID, int leftTalonChildID, 
                     boolean rightInversion, boolean leftInversion) {
@@ -31,74 +36,43 @@ public class Drivetrain extends SubsystemBase {
         m_leftParent.setInverted(leftInversion);
         m_leftChild.setInverted(leftInversion);
 
-        // differentialDrive = new DifferentialDrive(m_leftParent, m_rightParent);
-    }
+        differentialDrive = new DifferentialDrive(m_leftParent, m_rightParent);
+        addChild("Differential Drive",differentialDrive);
+        differentialDrive.setSafetyEnabled(true);
+        differentialDrive.setExpiration(0.1);
+        differentialDrive.setMaxOutput(1.0);
 
-    public void setPower(double rightPower, double leftPower) {
-        setRightPower(rightPower);
-        setLeftPower(leftPower);
-    }
-
-    public void setRightPower(double power) {
-        m_rightParent.set(ControlMode.PercentOutput, power);
-    }
-    
-    public void setLeftPower(double power) {
-        m_leftParent.set(ControlMode.PercentOutput, power);
-    }
-
-    public void setBrakeMode() {
         m_rightParent.setNeutralMode(NeutralMode.Brake);
         m_rightChild.setNeutralMode(NeutralMode.Brake);
         m_leftParent.setNeutralMode(NeutralMode.Brake);
         m_leftChild.setNeutralMode(NeutralMode.Brake);
     }
 
-    public void setCoastMode() {
-        m_rightParent.setNeutralMode(NeutralMode.Coast);
-        m_rightChild.setNeutralMode(NeutralMode.Coast);
-        m_leftParent.setNeutralMode(NeutralMode.Coast);
-        m_leftChild.setNeutralMode(NeutralMode.Coast);
+
+
+
+    public void speedDrive(double drive, double turn){
+
+        double maxPower = 0.5;
+        double jsDeadBand = Constants.OperatorConstants.kControllerDeadzone;
+
+        double drivePower = 0;
+        double turnPower = 0;
+
+        drivePower =  Math.abs(drive) >= jsDeadBand ? -maxPower * Math.pow(drive, 3) : 0;
+        turnPower =  Math.abs(turn) >= jsDeadBand ? -maxPower * Math.pow(turn, 3) * 0.8 : 0; //the turn is a little more sensitive
+        
+        
+        // System.out.println(drivePower + "         "+ turnPower);
+        differentialDrive.curvatureDrive(drivePower, turnPower, true);
+
+
+
     }
 
-    public void arcadeDrive(double moveSpeed, double rotateSpeed) {
-        // differentialDrive.arcadeDrive(moveSpeed, rotateSpeed);
-        if (Math.abs(moveSpeed) > 0.1) moveSpeed = 0.1 * Math.signum(moveSpeed);
-        if (Math.abs(rotateSpeed) > 0.1) rotateSpeed = 0.1 * Math.signum(rotateSpeed);
 
-        double max = Math.abs(moveSpeed);
-        if (Math.abs(rotateSpeed) > max) max = Math.abs(rotateSpeed);
-        double sum = moveSpeed + rotateSpeed;
-        double dif = moveSpeed - rotateSpeed;
 
-        SmartDashboard.putNumber("Move Speed", moveSpeed);
-        SmartDashboard.putNumber("Rotate Speed", rotateSpeed);
 
-        if (moveSpeed >= 0) {
-            if (rotateSpeed >= 0) {
-                setLeftPower(max);
-                setRightPower(dif);
-            }
-            else {
-                setLeftPower(sum);
-                setRightPower(max);
-            }
-        } else {
-            if (rotateSpeed >= 0) {
-                setLeftPower(sum);
-                setRightPower(-max);
-            }
-            else {
-                setLeftPower(-max);
-                setRightPower(dif);
-            }
-        }
-    }
 
-    public void tankDrive(double left, double right) {
-        if (Math.abs(left) > 0.1) left = 0.1 * Math.signum(left);
-        if (Math.abs(right) > 0.1) right = 0.1 * Math.signum(right);
-        setLeftPower(left);
-        setRightPower(right);
-    }
+    
 }

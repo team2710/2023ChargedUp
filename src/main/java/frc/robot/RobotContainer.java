@@ -73,11 +73,11 @@ public class RobotContainer {
         return elevator.getEncoderValue();
     }
 
-    public void setCoastMode() {
-        drivetrain.setCoastMode();
-    }
+    // public void setCoastMode() {
+    //     drivetrain.setCoastMode();
+    // }
 
-    public void setBrakeMode() {
-        drivetrain.setBrakeMode();
-    }
+    // public void setBrakeMode() {
+    //     drivetrain.setBrakeMode();
+    // }
 }
