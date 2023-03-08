@@ -1,7 +1,9 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -61,7 +63,36 @@ public class Drivetrain extends SubsystemBase {
 
     public void arcadeDrive(double moveSpeed, double rotateSpeed) {
         // differentialDrive.arcadeDrive(moveSpeed, rotateSpeed);
-        
+        if (Math.abs(moveSpeed) > 0.1) moveSpeed = 0.1 * Math.signum(moveSpeed);
+        if (Math.abs(rotateSpeed) > 0.1) rotateSpeed = 0.1 * Math.signum(rotateSpeed);
+
+        double max = Math.abs(moveSpeed);
+        if (Math.abs(rotateSpeed) > max) max = Math.abs(rotateSpeed);
+        double sum = moveSpeed + rotateSpeed;
+        double dif = moveSpeed - rotateSpeed;
+
+        SmartDashboard.putNumber("Move Speed", moveSpeed);
+        SmartDashboard.putNumber("Rotate Speed", rotateSpeed);
+
+        if (moveSpeed >= 0) {
+            if (rotateSpeed >= 0) {
+                setLeftPower(max);
+                setRightPower(dif);
+            }
+            else {
+                setLeftPower(sum);
+                setRightPower(max);
+            }
+        } else {
+            if (rotateSpeed >= 0) {
+                setLeftPower(sum);
+                setRightPower(-max);
+            }
+            else {
+                setLeftPower(-max);
+                setRightPower(dif);
+            }
+        }
     }
 
     public void tankDrive(double left, double right) {

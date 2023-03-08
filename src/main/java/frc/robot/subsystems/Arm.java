@@ -55,6 +55,6 @@ public class Arm extends SubsystemBase {
     }
 
     public void setSpeed(double speed) {
-        m_ArmTalonSRX.set(ControlMode.PercentOutput, speed, DemandType.ArbitraryFeedForward, 0.01);
+        m_ArmTalonSRX.set(ControlMode.PercentOutput, speed, DemandType.ArbitraryFeedForward, 0.05 * Math.sin(Math.toRadians(getAngle())));
     }
 }
