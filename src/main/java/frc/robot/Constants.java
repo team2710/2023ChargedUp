@@ -23,6 +23,10 @@ public final class Constants {
     public static class ArmConstants {
         public static final int kArmTalonSRX = 5;
         public static final int kIntakeTalonSRX = 10;
+        public static final int kIntakeSparkmax = 30;
+        public static final double kIntakeHold = 0.07;
+        public static final double kIntake = 0.5;
         public static final double kStartingAngle = 15; // degrees
+        public static final double kMaxIntakeMotorTemperature = 28;
     }
 }

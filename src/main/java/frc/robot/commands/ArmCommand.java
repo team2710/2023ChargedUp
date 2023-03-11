@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm;
@@ -29,18 +30,28 @@ public class ArmCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        // elevator.setPosition(7.5);
-        SmartDashboard.putNumber("Arm Set Position", 0);
     }
 
     @Override
     public void execute() {
-        double leftY = auxController.getRawAxis(1);
-        intake.setSpeed(leftY * 0.5);
+        // double leftY = auxController.getRawAxis(1);
+        // intake.setSpeed(-leftY);
 
-        double rightY = auxController.getRawAxis(3);
+        if (intake.getMotorTemperature() > Constants.ArmConstants.kMaxIntakeMotorTemperature) {
+            System.out.println("MOTOR TEMPERATURE TOO HIGH, ABORTING");
+            intake.stop();
+        }
+
+        // System.out.println(intake.getOutputCurrent());
+
+        // if (intake.getOutputCurrent() > 20) {
+        //     System.out.println("CONE DETECTED LOL");
+        //     CommandScheduler.getInstance().schedule(new IntakeCommand(intake, 5, Constants.ArmConstants.kIntakeHold));
+        // }
+
+        double rightY = auxController.getRawAxis(5);
         if (Math.abs(rightY) >= 0.1)
-            arm.setSpeed(rightY * 0.2);
+            arm.setSpeed(rightY * 0.3);
         // double position = SmartDashboard.getNumber("Arm Set Position", 0);
 
         // arm.setPosition(position);

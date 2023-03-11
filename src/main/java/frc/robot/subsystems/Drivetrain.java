@@ -55,8 +55,6 @@ public class Drivetrain extends SubsystemBase  {
 
     public void speedDrive(double drive, double turn, int mode){
         // speed mode: 0 default, 1 speed up, 2 speed down
-
-        System.out.println(mode);
         // maxPower = 1;
         if (mode == 1){
             maxPower = 1.0;
@@ -73,7 +71,7 @@ public class Drivetrain extends SubsystemBase  {
         double turnPower = 0;
 
         drivePower =  Math.abs(drive) >= jsDeadBand ? -maxPower * Math.pow(drive, 3) : 0;
-        turnPower =  Math.abs(turn) >= jsDeadBand ? -maxPower * Math.pow(turn, 3) * 0.8 : 0; //the turn is a little more sensitive
+        turnPower =  Math.abs(turn) >= jsDeadBand ? -maxPower * Math.pow(turn, 3) * 0.5 : 0; //the turn is a little more sensitive
         
         
         // System.out.println(drivePower + "         "+ turnPower);

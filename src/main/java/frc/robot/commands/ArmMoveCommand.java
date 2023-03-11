@@ -19,7 +19,6 @@ public class ArmMoveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        System.out.println(m_Position);
         m_Arm.setPosition(m_Position);
     }
 }
