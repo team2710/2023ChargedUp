@@ -5,13 +5,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
-    private RobotContainer robotContainer;
-
     @Override
     public void robotInit() {
-        robotContainer = new RobotContainer();
-        // robotContainer.setCoastMode();
-        robotContainer.resetArm();
+        RobotContainer.init();
+        RobotContainer.arm.resetEncoder();
     }
 
     @Override
@@ -26,7 +23,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        robotContainer.runAutos();
+        RobotContainer.runAutos();
     }
 
     @Override

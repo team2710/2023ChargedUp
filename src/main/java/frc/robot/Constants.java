@@ -18,6 +18,7 @@ public final class Constants {
         public static final int kLeftSparkmax = 16;
         public static final int kRightSparkmax = 17;
         public static final double kElevatorMax = 8.57;
+        public static final double kElevatorError = 0.2;
     }
 
     public static class ArmConstants {
@@ -28,5 +29,6 @@ public final class Constants {
         public static final double kIntake = 0.5;
         public static final double kStartingAngle = 15; // degrees
         public static final double kMaxIntakeMotorTemperature = 28;
+        public static final double kArmError = 100;
     }
 }

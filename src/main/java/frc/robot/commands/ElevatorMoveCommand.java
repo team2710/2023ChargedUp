@@ -16,7 +16,7 @@ public class ElevatorMoveCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return true;
+        return Math.abs(m_Elevator.getEncoderValue() - m_Position) < Constants.ElevatorConstants.kElevatorError;
     }
 
     @Override
