@@ -51,7 +51,7 @@ public class ArmCommand extends CommandBase {
 
         double rightY = auxController.getRawAxis(5);
         if (Math.abs(rightY) >= 0.1)
-            arm.setSpeed(rightY * 0.3);
+            arm.setSpeed(rightY * 0.5);
         // double position = SmartDashboard.getNumber("Arm Set Position", 0);
 
         // arm.setPosition(position);

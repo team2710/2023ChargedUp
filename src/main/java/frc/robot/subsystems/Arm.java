@@ -17,7 +17,7 @@ public class Arm extends SubsystemBase {
 
         m_ArmTalonSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
         m_ArmTalonSRX.configFactoryDefault();
-        m_ArmTalonSRX.configPeakOutputForward(0.35);
+        m_ArmTalonSRX.configPeakOutputForward(0.45);
         m_ArmTalonSRX.configPeakOutputReverse(-0.05);
 
         m_ArmTalonSRX.config_kP(0, 0.5);

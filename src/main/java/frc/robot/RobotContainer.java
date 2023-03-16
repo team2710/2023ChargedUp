@@ -4,6 +4,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.ArmMoveCommand;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.DriveStraightCommand;
 import frc.robot.commands.ElevatorCommand;
 import frc.robot.commands.ElevatorMoveCommand;
 import frc.robot.commands.IntakeCommand;
@@ -12,8 +13,13 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -38,12 +44,8 @@ public class RobotContainer {
         driverController = new CommandXboxController(Constants.OperatorConstants.kDriverControllerPort);
         auxController = new CommandXboxController(Constants.OperatorConstants.kAuxControllerPort);
 
-        drivetrain.setDefaultCommand(new DriveCommand(drivetrain, driverController, 0));
-        elevator.setDefaultCommand(new ElevatorCommand(elevator, auxController));
-        arm.setDefaultCommand(new ArmCommand(arm, intake, auxController));
         // intake.setDefaultCommand(new IntakeTemperatureCommand(intake));
 
-        configureButtonBindings();
     }
 
     public void configureButtonBindings() {
@@ -86,8 +88,101 @@ public class RobotContainer {
         return elevator.getEncoderValue();
     }
 
-    public void runAutos() {
-        CommandScheduler.getInstance().schedule(new ArmMoveCommand(arm, 4800).alongWith(new ElevatorMoveCommand(elevator,Constants.ElevatorConstants.kElevatorMax).andThen(new WaitCommand(2).andThen(new IntakeCommand(intake, 25, -0.25)))));
+    public void runTeleop() {
+        drivetrain.setDefaultCommand(new DriveCommand(drivetrain, driverController, 0));
+        elevator.setDefaultCommand(new ElevatorCommand(elevator, auxController));
+        arm.setDefaultCommand(new ArmCommand(arm, intake, auxController));
+        configureButtonBindings();
+    }
+
+    public void runAutos(String scoringAuto, String taxiAuto) {
+
+        SequentialCommandGroup scoringAutoCommand = new SequentialCommandGroup();
+        double taxiDriveTime = 0;
+        switch (scoringAuto) {
+            case "Cube Mid":
+                scoringAutoCommand.addCommands(
+                    new ArmMoveCommand(arm, 4800),
+                    new ElevatorMoveCommand(elevator,Constants.ElevatorConstants.kElevatorMax),
+                    new WaitCommand(2),
+                    new IntakeCommand(intake, 25, 0.5),
+                    new WaitCommand(1),
+                    new IntakeCommand(intake, 25, 0),
+                    new WaitCommand(1),
+                    new ElevatorMoveCommand(elevator, 0),
+                    new ArmMoveCommand(arm, 0)
+                );
+                taxiDriveTime = 3.25;
+                break;
+            case "Cube Low":
+                scoringAutoCommand.addCommands(
+                    new ArmMoveCommand(arm, 4800),
+                    new WaitCommand(2),
+                    new IntakeCommand(intake, 25, 0.5),
+                    new WaitCommand(1),
+                    new IntakeCommand(intake, 25, 0),
+                    new WaitCommand(1),
+                    new ElevatorMoveCommand(elevator, 0),
+                    new ArmMoveCommand(arm, 0)
+                );
+                taxiDriveTime = 3;
+                break;
+        }
+
+        SequentialCommandGroup taxiAutoCommand = new SequentialCommandGroup();
+
+        switch (taxiAuto) {
+            case "Taxi":
+                taxiAutoCommand.addCommands(
+                    new InstantCommand(() -> {
+                        drivetrain.driveStraight(-0.5);
+                    }),
+                    new WaitCommand(3.5),
+                    new InstantCommand(() -> {
+                        drivetrain.driveStraight(0);
+                    })
+                );
+                break;
+            case "No Taxi":
+                break;
+        }
+
+        CommandScheduler.getInstance().schedule(new SequentialCommandGroup(scoringAutoCommand, taxiAutoCommand));
+
+        // CommandScheduler.getInstance().schedule(
+            // Cube Mid Auto
+            // new ArmMoveCommand(arm, 4800)
+            //     .alongWith(new ElevatorMoveCommand(elevator,Constants.ElevatorConstants.kElevatorMax)
+            //     .andThen(new WaitCommand(2)
+            //     .andThen(new IntakeCommand(intake, 25, 0.5))
+            //     .andThen(new WaitCommand(1))
+            //     .andThen(new IntakeCommand(intake, 25, 0))
+            //     .andThen(new WaitCommand(1))
+            //     .andThen(new ElevatorMoveCommand(elevator, 0))
+            //     .andThen(new ArmMoveCommand(arm, 0))
+
+            //     // Taxi
+            //     .andThen(new InstantCommand(() -> {
+            //         drivetrain.driveStraight(-0.5);
+            //     })
+            //     .andThen(new WaitCommand(3.25))
+            //     .andThen(new InstantCommand(() -> {
+            //         drivetrain.driveStraight(0);
+            //     })))
+            // )));
+
+            // new SequentialCommandGroup(scoringAutoCommand, taxiAutoCommand))
+
+            // CommandScheduler.getInstance().schedule(
+            //         (new InstantCommand(() -> {
+            //             drivetrain.speedDrive(1, 0, 0);
+            //         })
+                    
+            //     ));
+    }
+
+    public void periodic() {
+        SmartDashboard.putNumber("Wheel Rotation", drivetrain.m_leftParent.getSelectedSensorPosition());
     }
 
     // public void setCoastMode() {

@@ -13,13 +13,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 public class Drivetrain extends SubsystemBase  {
 
     
-    private WPI_TalonFX m_rightParent, m_leftParent, m_rightChild, m_leftChild;
+    public WPI_TalonFX m_rightParent, m_leftParent, m_rightChild, m_leftChild;
     public DifferentialDrive differentialDrive;
 
     public double maxPower;
-
-
-
 
     public Drivetrain(int rightTalonParentID, int leftTalonParentID, int rightTalonChildID, int leftTalonChildID, 
                     boolean rightInversion, boolean leftInversion) {
@@ -40,7 +37,7 @@ public class Drivetrain extends SubsystemBase  {
 
         differentialDrive = new DifferentialDrive(m_leftParent, m_rightParent);
         addChild("Differential Drive",differentialDrive);
-        differentialDrive.setSafetyEnabled(true);
+        differentialDrive.setSafetyEnabled(false);
         differentialDrive.setExpiration(0.1);
         differentialDrive.setMaxOutput(1.0);
 
@@ -49,8 +46,6 @@ public class Drivetrain extends SubsystemBase  {
         m_leftParent.setNeutralMode(NeutralMode.Brake);
         m_leftChild.setNeutralMode(NeutralMode.Brake);
     }
-
-
 
 
     public void speedDrive(double drive, double turn, int mode){
@@ -63,31 +58,23 @@ public class Drivetrain extends SubsystemBase  {
         }else{
             maxPower = 0.6;
         }
-
-
         double jsDeadBand = Constants.OperatorConstants.kControllerDeadzone;
 
         double drivePower = 0;
         double turnPower = 0;
 
         drivePower =  Math.abs(drive) >= jsDeadBand ? -maxPower * Math.pow(drive, 3) : 0;
-        turnPower =  Math.abs(turn) >= jsDeadBand ? -maxPower * Math.pow(turn, 3) * 0.5 : 0; //the turn is a little more sensitive
+        turnPower =  Math.abs(turn) >= jsDeadBand ? -maxPower * Math.pow(turn, 3) * 0.7 : 0; //the turn is a little more sensitive
         
+        SmartDashboard.putNumber("Drive Power", drivePower);
+        SmartDashboard.putNumber("Turn Power", turnPower);
         
         // System.out.println(drivePower + "         "+ turnPower);
         differentialDrive.curvatureDrive(drivePower, turnPower, true);
-
-
-
     }
 
     public void driveStraight(double speed){
-        differentialDrive.tankDrive(-speed, -speed);
+        SmartDashboard.putNumber("Drive Speed", speed);
+        differentialDrive.tankDrive(speed, speed);
     }
-
-
-
-
-
-    
 }

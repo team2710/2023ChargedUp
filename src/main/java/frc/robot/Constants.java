@@ -27,6 +27,6 @@ public final class Constants {
         public static final double kIntakeHold = 0.07;
         public static final double kIntake = 0.5;
         public static final double kStartingAngle = 15; // degrees
-        public static final double kMaxIntakeMotorTemperature = 28;
+        public static final double kMaxIntakeMotorTemperature = 32;
     }
 }
