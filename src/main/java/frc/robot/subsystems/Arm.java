@@ -17,7 +17,7 @@ public class Arm extends SubsystemBase {
 
         m_ArmTalonSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
         m_ArmTalonSRX.configFactoryDefault();
-        m_ArmTalonSRX.configPeakOutputForward(0.45);
+        m_ArmTalonSRX.configPeakOutputForward(0.25);
         m_ArmTalonSRX.configPeakOutputReverse(-0.05);
 
         m_ArmTalonSRX.config_kP(0, 0.5);
@@ -25,9 +25,16 @@ public class Arm extends SubsystemBase {
         m_ArmTalonSRX.config_kD(0, 0.3);
         m_ArmTalonSRX.config_kF(0, 0.1);
 
+        m_ArmTalonSRX.enableCurrentLimit(true);
+        m_ArmTalonSRX.configPeakCurrentLimit(25);
+
         m_ArmTalonSRX.setNeutralMode(NeutralMode.Coast);
 
         resetEncoder();
+    }
+
+    public void zero() {
+        m_ArmTalonSRX.set(ControlMode.PercentOutput, 0);
     }
 
     public void setPower(double power) {

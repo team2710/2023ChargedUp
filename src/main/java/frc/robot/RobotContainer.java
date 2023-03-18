@@ -8,6 +8,8 @@ import frc.robot.commands.DriveStraightCommand;
 import frc.robot.commands.ElevatorCommand;
 import frc.robot.commands.ElevatorMoveCommand;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.ZeroArm;
+import frc.robot.commands.Auto.BalanceCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
@@ -27,13 +29,14 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
-    private final Drivetrain drivetrain;
-    private final Elevator elevator;
-    private final Arm arm;
-    private final Intake intake;
+    public static Drivetrain drivetrain;
+    public static Elevator elevator;
+    public static Arm arm;
+    public static Intake intake;
+    public static boolean isBalancing;
     
-    private final CommandXboxController driverController;
-    private final CommandXboxController auxController;
+    public static CommandXboxController driverController;
+    public static CommandXboxController auxController;
 
     public RobotContainer() {
         drivetrain = new Drivetrain(Constants.DriveConstants.kRightParentTalon, Constants.DriveConstants.kLeftParentTalon, Constants.DriveConstants.kRightChildTalon, Constants.DriveConstants.kLeftChildTalon, false, true);
@@ -43,21 +46,26 @@ public class RobotContainer {
 
         driverController = new CommandXboxController(Constants.OperatorConstants.kDriverControllerPort);
         auxController = new CommandXboxController(Constants.OperatorConstants.kAuxControllerPort);
-
-        // intake.setDefaultCommand(new IntakeTemperatureCommand(intake));
-
     }
 
     public void configureButtonBindings() {
-        Trigger rightBumper = auxController.rightBumper();
+        // Trigger rightBumper = auxController.rightBumper();
+        Trigger driverPovDown = driverController.povDown();
         Trigger leftBumper = auxController.leftBumper();
-        rightBumper.onTrue(new ElevatorMoveCommand(elevator, Constants.ElevatorConstants.kElevatorMax).alongWith(new DriveCommand(drivetrain, driverController, 2)));
-        leftBumper.onTrue(new ElevatorMoveCommand(elevator, 0).andThen(new WaitCommand(0.5)).andThen(new DriveCommand(drivetrain, driverController, 0)));
+        // rightBumper.onTrue(new ElevatorMoveCommand(elevator, Constants.ElevatorConstants.kElevatorMax)
+        //     .alongWith(new DriveCommand(drivetrain, driverController, 2))
+        //     .alongWith(new ArmMoveCommand(arm, 5700)));
+        leftBumper.onTrue(new ElevatorMoveCommand(elevator, 0)
+            .andThen(new WaitCommand(0.5))
+            .andThen(new DriveCommand(drivetrain, driverController, 0))
+            .alongWith(new ArmMoveCommand(arm, 0)));
 
-        Trigger bButton = auxController.b();
+        // Trigger bButton = auxController.b();
         Trigger aButton = auxController.a();
-        bButton.onTrue(new ArmMoveCommand(arm, 4800));
+        // bButton.onTrue(new ArmMoveCommand(arm, 5500));
         aButton.onTrue(new ArmMoveCommand(arm, 0));
+
+        driverPovDown.onTrue(new ZeroArm(arm));
 
         Trigger driverLeftBumper = driverController.leftBumper();
         driverLeftBumper.whileTrue(new DriveCommand(drivetrain, driverController, 1));
@@ -67,25 +75,26 @@ public class RobotContainer {
 
         Trigger yButton = auxController.y();
         Trigger xButton = auxController.x();
-        Trigger povUpButton = auxController.povUp();
         Trigger povDownButton = auxController.povDown();
-        yButton.onTrue(new IntakeCommand(intake, 25, Constants.ArmConstants.kIntake));
-        xButton.onTrue(new IntakeCommand(intake, 25, Constants.ArmConstants.kIntake * -1));
-        povUpButton.onTrue(new IntakeCommand(intake, 5, Constants.ArmConstants.kIntakeHold));
+        yButton.onTrue(new IntakeCommand(intake, 25, Constants.ArmConstants.kIntake))
+            .onFalse(new IntakeCommand(intake, 5, Constants.ArmConstants.kIntakeHold));
+        xButton.onTrue(new IntakeCommand(intake, 25, Constants.ArmConstants.KOuttake * -1))
+            .onFalse(new IntakeCommand(intake, 25, 0));
         povDownButton.onTrue(new IntakeCommand(intake, 25, 0));
+
+        Trigger rightButtonTrigger = auxController.rightStick();
+        rightButtonTrigger.onTrue(new ArmMoveCommand(arm, 2250));
+
+        Trigger povRightButton = auxController.povRight();
+        povRightButton.onTrue(new ElevatorMoveCommand(elevator, Constants.ElevatorConstants.kCubeMid)
+            .alongWith(new DriveCommand(drivetrain, driverController, 2))
+            .alongWith(new ArmMoveCommand(arm, 4500)));
+
+        Trigger bButton = auxController.b();
+        bButton.onTrue(new ElevatorMoveCommand(elevator, Constants.ElevatorConstants.kCubeMid+1)
+                .alongWith(new DriveCommand(drivetrain, driverController, 2))
+                .alongWith(new ArmMoveCommand(arm, 5250)));
         // yButton.onFalse()
-    }
-
-    public void resetArm() {
-        arm.resetEncoder();
-    }
-
-    public void setElevatorPosition(double height) {
-        elevator.setPosition(height);
-    }
-
-    public double getElevatorPosition() {
-        return elevator.getEncoderValue();
     }
 
     public void runTeleop() {
@@ -96,14 +105,12 @@ public class RobotContainer {
     }
 
     public void runAutos(String scoringAuto, String taxiAuto) {
-
         SequentialCommandGroup scoringAutoCommand = new SequentialCommandGroup();
-        double taxiDriveTime = 0;
         switch (scoringAuto) {
             case "Cube Mid":
                 scoringAutoCommand.addCommands(
-                    new ArmMoveCommand(arm, 4800),
-                    new ElevatorMoveCommand(elevator,Constants.ElevatorConstants.kElevatorMax),
+                    new ArmMoveCommand(arm, 5250),
+                    new ElevatorMoveCommand(elevator,Constants.ElevatorConstants.kCubeMid+1),
                     new WaitCommand(2),
                     new IntakeCommand(intake, 25, 0.5),
                     new WaitCommand(1),
@@ -112,11 +119,10 @@ public class RobotContainer {
                     new ElevatorMoveCommand(elevator, 0),
                     new ArmMoveCommand(arm, 0)
                 );
-                taxiDriveTime = 3.25;
                 break;
             case "Cube Low":
                 scoringAutoCommand.addCommands(
-                    new ArmMoveCommand(arm, 4800),
+                    new ArmMoveCommand(arm, 5150),
                     new WaitCommand(2),
                     new IntakeCommand(intake, 25, 0.5),
                     new WaitCommand(1),
@@ -125,7 +131,6 @@ public class RobotContainer {
                     new ElevatorMoveCommand(elevator, 0),
                     new ArmMoveCommand(arm, 0)
                 );
-                taxiDriveTime = 3;
                 break;
         }
 
@@ -137,59 +142,39 @@ public class RobotContainer {
                     new InstantCommand(() -> {
                         drivetrain.driveStraight(-0.5);
                     }),
-                    new WaitCommand(3.5),
+                    new WaitCommand(4),
                     new InstantCommand(() -> {
                         drivetrain.driveStraight(0);
                     })
                 );
                 break;
+            case "Auto Balance":
+                taxiAutoCommand.addCommands(new InstantCommand(() -> {
+                    drivetrain.driveStraight(-0.5);
+                }), new RunCommand(() -> {
+                    double speed = 0.4;
+                    if (Math.abs(drivetrain.getRoll())-3.56 > 1) {
+                        if (Math.signum(drivetrain.getRoll()) > 0)
+                            speed = 0.3;
+                        drivetrain.driveStraight(speed * Math.signum(drivetrain.getRoll()));
+                        isBalancing = true;
+                        SmartDashboard.putBoolean("is balancing", true);
+                    } else if(isBalancing) {
+                        drivetrain.driveStraight(0);
+                    }
+                }, drivetrain));
             case "No Taxi":
                 break;
         }
 
+        SmartDashboard.putBoolean("is balancing", false);
         CommandScheduler.getInstance().schedule(new SequentialCommandGroup(scoringAutoCommand, taxiAutoCommand));
-
-        // CommandScheduler.getInstance().schedule(
-            // Cube Mid Auto
-            // new ArmMoveCommand(arm, 4800)
-            //     .alongWith(new ElevatorMoveCommand(elevator,Constants.ElevatorConstants.kElevatorMax)
-            //     .andThen(new WaitCommand(2)
-            //     .andThen(new IntakeCommand(intake, 25, 0.5))
-            //     .andThen(new WaitCommand(1))
-            //     .andThen(new IntakeCommand(intake, 25, 0))
-            //     .andThen(new WaitCommand(1))
-            //     .andThen(new ElevatorMoveCommand(elevator, 0))
-            //     .andThen(new ArmMoveCommand(arm, 0))
-
-            //     // Taxi
-            //     .andThen(new InstantCommand(() -> {
-            //         drivetrain.driveStraight(-0.5);
-            //     })
-            //     .andThen(new WaitCommand(3.25))
-            //     .andThen(new InstantCommand(() -> {
-            //         drivetrain.driveStraight(0);
-            //     })))
-            // )));
-
-            // new SequentialCommandGroup(scoringAutoCommand, taxiAutoCommand))
-
-            // CommandScheduler.getInstance().schedule(
-            //         (new InstantCommand(() -> {
-            //             drivetrain.speedDrive(1, 0, 0);
-            //         })
-                    
-            //     ));
     }
 
-    public void periodic() {
-        SmartDashboard.putNumber("Wheel Rotation", drivetrain.m_leftParent.getSelectedSensorPosition());
+    public void updateSmartdashboard() {
+        // SmartDashboard.putNumber("Wheel Rotation", drivetrain.m_leftParent.getSelectedSensorPosition());
+        SmartDashboard.putNumber("Roll", drivetrain.getRoll());
+        SmartDashboard.putNumber("Pitch", drivetrain.getPitch());
+        SmartDashboard.putNumber("Yaw", drivetrain.getYaw());
     }
-
-    // public void setCoastMode() {
-    //     drivetrain.setCoastMode();
-    // }
-
-    // public void setBrakeMode() {
-    //     drivetrain.setBrakeMode();
-    // }
 }

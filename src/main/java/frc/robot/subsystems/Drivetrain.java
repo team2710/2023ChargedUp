@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -8,13 +11,16 @@ import frc.robot.Constants;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.kauailabs.navx.frc.AHRS;
 
 
 public class Drivetrain extends SubsystemBase  {
 
     
-    public WPI_TalonFX m_rightParent, m_leftParent, m_rightChild, m_leftChild;
-    public DifferentialDrive differentialDrive;
+    private WPI_TalonFX m_rightParent, m_leftParent, m_rightChild, m_leftChild;
+    private DifferentialDrive differentialDrive;
+    private DifferentialDriveOdometry differentialDriveOdometry;
+    private AHRS m_Ahrs;
 
     public double maxPower;
 
@@ -45,14 +51,57 @@ public class Drivetrain extends SubsystemBase  {
         m_rightChild.setNeutralMode(NeutralMode.Brake);
         m_leftParent.setNeutralMode(NeutralMode.Brake);
         m_leftChild.setNeutralMode(NeutralMode.Brake);
+
+        try {
+            /***********************************************************************
+             * navX-MXP: - Communication via RoboRIO MXP (SPI, I2C) and USB. - See
+             * http://navx-mxp.kauailabs.com/guidance/selecting-an-interface.
+             * 
+             * navX-Micro: - Communication via I2C (RoboRIO MXP or Onboard) and USB. - See
+             * http://navx-micro.kauailabs.com/guidance/selecting-an-interface.
+             * 
+             * VMX-pi: - Communication via USB. - See
+             * https://vmx-pi.kauailabs.com/installation/roborio-installation/
+             * 
+             * Multiple navX-model devices on a single robot are supported.
+             ************************************************************************/
+            SmartDashboard.putString("workie", "workie");
+            m_Ahrs = new AHRS(Port.kMXP);
+            // m_Ahrs.calibrate();
+            // differentialDriveOdometry = new DifferentialDriveOdometry(m_Ahrs.getRotation2d(), getLeftDistance(), getRightDistance());
+        } catch (RuntimeException ex) {
+            SmartDashboard.putString("No workie rip", "No workie rip");
+            DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
+        }
     }
 
+    @Override
+    public void periodic() {
+        // differentialDriveOdometry.update(m_Ahrs.getRotation2d(), getLeftDistance(), getRightDistance());
+
+        // double xPosition = differentialDriveOdometry.getPoseMeters().getX();
+        // double yPosition = differentialDriveOdometry.getPoseMeters().getY();
+
+        // SmartDashboard.putNumber("x position", xPosition);
+        // SmartDashboard.putNumber("y position", yPosition);
+    }
+
+    public double getLeftDistance() {
+        return (m_leftParent.getSelectedSensorPosition() / 10.65) * (0.1524 * Math.PI);
+    }
+
+    public double getRightDistance() {
+        return (m_rightParent.getSelectedSensorPosition() / 10.65) * (0.1524 * Math.PI);
+    }
 
     public void speedDrive(double drive, double turn, int mode){
         // speed mode: 0 default, 1 speed up, 2 speed down
         // maxPower = 1;
+        double turnMultiplier = 0.7;
         if (mode == 1){
+            turnMultiplier = 0.5;
             maxPower = 1.0;
+
         }else if (mode == 2){
             maxPower = 0.2;
         }else{
@@ -64,7 +113,7 @@ public class Drivetrain extends SubsystemBase  {
         double turnPower = 0;
 
         drivePower =  Math.abs(drive) >= jsDeadBand ? -maxPower * Math.pow(drive, 3) : 0;
-        turnPower =  Math.abs(turn) >= jsDeadBand ? -maxPower * Math.pow(turn, 3) * 0.7 : 0; //the turn is a little more sensitive
+        turnPower =  Math.abs(turn) >= jsDeadBand ? -maxPower * Math.pow(turn, 3) * turnMultiplier : 0; //the turn is a little more sensitive
         
         SmartDashboard.putNumber("Drive Power", drivePower);
         SmartDashboard.putNumber("Turn Power", turnPower);
@@ -76,5 +125,17 @@ public class Drivetrain extends SubsystemBase  {
     public void driveStraight(double speed){
         SmartDashboard.putNumber("Drive Speed", speed);
         differentialDrive.tankDrive(speed, speed);
+    }
+
+    public float getRoll() {
+        return m_Ahrs.getRoll();
+    }
+
+    public float getPitch() {
+        return m_Ahrs.getPitch();
+    }
+
+    public float getYaw() {
+        return m_Ahrs.getYaw();
     }
 }

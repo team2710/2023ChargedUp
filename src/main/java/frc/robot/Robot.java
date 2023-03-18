@@ -14,12 +14,12 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         robotContainer = new RobotContainer();
-        // robotContainer.setCoastMode();
-        robotContainer.resetArm();
+        RobotContainer.arm.resetEncoder();
 
         scoringAutoChooser.setDefaultOption("Cube Mid", "Cube Mid");
         scoringAutoChooser.addOption("Cube Low", "Cube Low");
         taxiAutoChooser.setDefaultOption("Taxi", "Taxi");
+        taxiAutoChooser.setDefaultOption("Auto Balance", "Auto Balance");
         taxiAutoChooser.setDefaultOption("No Taxi", "No Taxi");
 
         SmartDashboard.putData("Scoring Auto Chooser", scoringAutoChooser);
@@ -27,13 +27,21 @@ public class Robot extends TimedRobot {
     }
 
     @Override
+    public void disabledPeriodic() {
+    }
+
+    @Override
+    public void testInit() {
+    }
+
+    @Override
     public void testPeriodic() {
-        robotContainer.periodic();
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        robotContainer.updateSmartdashboard();
     }
 
     @Override

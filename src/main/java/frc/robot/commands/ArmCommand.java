@@ -39,7 +39,7 @@ public class ArmCommand extends CommandBase {
 
         if (intake.getMotorTemperature() > Constants.ArmConstants.kMaxIntakeMotorTemperature) {
             System.out.println("MOTOR TEMPERATURE TOO HIGH, ABORTING");
-            intake.stop();
+            // intake.stop();
         }
 
         // System.out.println(intake.getOutputCurrent());
@@ -50,8 +50,9 @@ public class ArmCommand extends CommandBase {
         // }
 
         double rightY = auxController.getRawAxis(5);
-        if (Math.abs(rightY) >= 0.1)
-            arm.setSpeed(rightY * 0.5);
+        // if (Math.abs(rightY) >= 0.1)
+            // arm.setPosition(arm.getRawEncoder()+100*Math.signum(rightY));
+            // arm.setPower(rightY * 0.1);
         // double position = SmartDashboard.getNumber("Arm Set Position", 0);
 
         // arm.setPosition(position);

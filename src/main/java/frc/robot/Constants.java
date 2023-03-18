@@ -17,15 +17,17 @@ public final class Constants {
     public static class ElevatorConstants {
         public static final int kLeftSparkmax = 16;
         public static final int kRightSparkmax = 17;
-        public static final double kElevatorMax = 8.57;
+        public static final double kElevatorMax = 12.75;
+        public static final double kCubeMid = 8.75;
     }
 
     public static class ArmConstants {
-        public static final int kArmTalonSRX = 5;
+        public static final int kArmTalonSRX = 10;
         public static final int kIntakeTalonSRX = 10;
-        public static final int kIntakeSparkmax = 30;
+        public static final int kIntakeSparkmax = 5;
         public static final double kIntakeHold = 0.07;
         public static final double kIntake = 0.5;
+        public static final double KOuttake = 0.75;
         public static final double kStartingAngle = 15; // degrees
         public static final double kMaxIntakeMotorTemperature = 32;
     }

@@ -20,7 +20,7 @@ public class ElevatorMoveCommand extends CommandBase {
     }
 
     @Override
-    public void initialize() {
+    public void execute() {
         m_Elevator.setPosition(m_Position);
     }
 }
