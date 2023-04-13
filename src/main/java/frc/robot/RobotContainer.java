@@ -49,12 +49,12 @@ public class RobotContainer {
     }
 
     public void configureButtonBindings() {
-        // Trigger rightBumper = auxController.rightBumper();
+        Trigger rightBumper = auxController.rightBumper();
         Trigger driverPovDown = driverController.povDown();
         Trigger leftBumper = auxController.leftBumper();
-        // rightBumper.onTrue(new ElevatorMoveCommand(elevator, Constants.ElevatorConstants.kElevatorMax)
-        //     .alongWith(new DriveCommand(drivetrain, driverController, 2))
-        //     .alongWith(new ArmMoveCommand(arm, 5700)));
+        rightBumper.onTrue(new ElevatorMoveCommand(elevator, Constants.ElevatorConstants.kElevatorMax)
+            .alongWith(new DriveCommand(drivetrain, driverController, 2))
+            .alongWith(new ArmMoveCommand(arm, 5250)));
         leftBumper.onTrue(new ElevatorMoveCommand(elevator, 0)
             .andThen(new WaitCommand(0.5))
             .andThen(new DriveCommand(drivetrain, driverController, 0))
@@ -83,7 +83,7 @@ public class RobotContainer {
         povDownButton.onTrue(new IntakeCommand(intake, 25, 0));
 
         Trigger rightButtonTrigger = auxController.rightStick();
-        rightButtonTrigger.onTrue(new ArmMoveCommand(arm, 2250));
+        rightButtonTrigger.onTrue(new ArmMoveCommand(arm, 2000));
 
         Trigger povRightButton = auxController.povRight();
         povRightButton.onTrue(new ElevatorMoveCommand(elevator, Constants.ElevatorConstants.kCubeMid)

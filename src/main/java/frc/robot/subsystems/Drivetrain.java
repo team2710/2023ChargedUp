@@ -97,12 +97,13 @@ public class Drivetrain extends SubsystemBase  {
     public void speedDrive(double drive, double turn, int mode){
         // speed mode: 0 default, 1 speed up, 2 speed down
         // maxPower = 1;
-        double turnMultiplier = 0.7;
+        double turnMultiplier = 0.65;
         if (mode == 1){
             turnMultiplier = 0.5;
             maxPower = 1.0;
 
         }else if (mode == 2){
+            turnMultiplier = 0.8;
             maxPower = 0.2;
         }else{
             maxPower = 0.6;
