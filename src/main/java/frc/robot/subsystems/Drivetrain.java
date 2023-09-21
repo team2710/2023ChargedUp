@@ -94,6 +94,48 @@ public class Drivetrain extends SubsystemBase  {
         return (m_rightParent.getSelectedSensorPosition() / 10.65) * (0.1524 * Math.PI);
     }
 
+    public void setRightPower(double power) {
+        m_rightParent.set(ControlMode.PercentOutput, power);
+    }
+    
+    public void setLeftPower(double power) {
+        m_leftParent.set(ControlMode.PercentOutput, power);
+    }
+
+    public void arcadeDrive(double moveSpeed, double rotateSpeed) {
+        // differentialDrive.arcadeDrive(moveSpeed, rotateSpeed);
+        // if (Math.abs(moveSpeed) > 0.1) moveSpeed = 0.1 * Math.signum(moveSpeed);
+        // if (Math.abs(rotateSpeed) > 0.1) rotateSpeed = 0.1 * Math.signum(rotateSpeed);
+
+        double max = Math.abs(moveSpeed);
+        if (Math.abs(rotateSpeed) > max) max = Math.abs(rotateSpeed);
+        double sum = moveSpeed + rotateSpeed;
+        double dif = moveSpeed - rotateSpeed;
+
+        SmartDashboard.putNumber("Move Speed", moveSpeed);
+        SmartDashboard.putNumber("Rotate Speed", rotateSpeed);
+
+        if (moveSpeed >= 0) {
+            if (rotateSpeed >= 0) {
+                setLeftPower(max);
+                setRightPower(dif);
+            }
+            else {
+                setLeftPower(sum);
+                setRightPower(max);
+            }
+        } else {
+            if (rotateSpeed >= 0) {
+                setLeftPower(sum);
+                setRightPower(-max);
+            }
+            else {
+                setLeftPower(-max);
+                setRightPower(dif);
+            }
+        }
+    }
+
     public void speedDrive(double drive, double turn, int mode){
         // speed mode: 0 default, 1 speed up, 2 speed down
         // maxPower = 1;
@@ -120,7 +162,7 @@ public class Drivetrain extends SubsystemBase  {
         SmartDashboard.putNumber("Turn Power", turnPower);
         
         // System.out.println(drivePower + "         "+ turnPower);
-        differentialDrive.curvatureDrive(drivePower, turnPower, true);
+        arcadeDrive(drivePower, -turnPower);
     }
 
     public void driveStraight(double speed){

@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -36,7 +37,8 @@ public class RobotContainer {
     public static boolean isBalancing;
     
     public static CommandXboxController driverController;
-    public static CommandXboxController auxController;
+    // public static CommandXboxController auxController;
+    public static CommandPS4Controller auxController;
 
     public RobotContainer() {
         drivetrain = new Drivetrain(Constants.DriveConstants.kRightParentTalon, Constants.DriveConstants.kLeftParentTalon, Constants.DriveConstants.kRightChildTalon, Constants.DriveConstants.kLeftChildTalon, false, true);
@@ -45,13 +47,15 @@ public class RobotContainer {
         intake = new Intake(Constants.ArmConstants.kIntakeSparkmax);
 
         driverController = new CommandXboxController(Constants.OperatorConstants.kDriverControllerPort);
-        auxController = new CommandXboxController(Constants.OperatorConstants.kAuxControllerPort);
+        auxController = new CommandPS4Controller(Constants.OperatorConstants.kAuxControllerPort);
     }
 
     public void configureButtonBindings() {
-        Trigger rightBumper = auxController.rightBumper();
+        // Trigger rightBumper = auxController.rightBumper();
+        Trigger rightBumper = auxController.R1();
         Trigger driverPovDown = driverController.povDown();
-        Trigger leftBumper = auxController.leftBumper();
+        // Trigger leftBumper = auxController.leftBumper();
+        Trigger leftBumper = auxController.L1();
         rightBumper.onTrue(new ElevatorMoveCommand(elevator, Constants.ElevatorConstants.kElevatorMax)
             .alongWith(new DriveCommand(drivetrain, driverController, 2))
             .alongWith(new ArmMoveCommand(arm, 5250)));
@@ -61,7 +65,8 @@ public class RobotContainer {
             .alongWith(new ArmMoveCommand(arm, 0)));
 
         // Trigger bButton = auxController.b();
-        Trigger aButton = auxController.a();
+        // Trigger aButton = auxController.a();
+        Trigger aButton = auxController.cross();
         // bButton.onTrue(new ArmMoveCommand(arm, 5500));
         aButton.onTrue(new ArmMoveCommand(arm, 0));
 
@@ -73,8 +78,10 @@ public class RobotContainer {
         driverRightBumper.whileTrue(new DriveCommand(drivetrain, driverController, 2));
 
 
-        Trigger yButton = auxController.y();
-        Trigger xButton = auxController.x();
+        // Trigger yButton = auxController.y();
+        // Trigger xButton = auxController.x();
+        Trigger yButton = auxController.triangle();
+        Trigger xButton = auxController.square();
         Trigger povDownButton = auxController.povDown();
         yButton.onTrue(new IntakeCommand(intake, 25, Constants.ArmConstants.kIntake))
             .onFalse(new IntakeCommand(intake, 5, Constants.ArmConstants.kIntakeHold));
@@ -82,7 +89,8 @@ public class RobotContainer {
             .onFalse(new IntakeCommand(intake, 25, 0));
         povDownButton.onTrue(new IntakeCommand(intake, 25, 0));
 
-        Trigger rightButtonTrigger = auxController.rightStick();
+        // Trigger rightButtonTrigger = auxController.rightStick();
+        Trigger rightButtonTrigger = auxController.povLeft();
         rightButtonTrigger.onTrue(new ArmMoveCommand(arm, 2000));
 
         Trigger povRightButton = auxController.povRight();
@@ -90,7 +98,8 @@ public class RobotContainer {
             .alongWith(new DriveCommand(drivetrain, driverController, 2))
             .alongWith(new ArmMoveCommand(arm, 4500)));
 
-        Trigger bButton = auxController.b();
+        // Trigger bButton = auxController.b();
+        Trigger bButton = auxController.circle();
         bButton.onTrue(new ElevatorMoveCommand(elevator, Constants.ElevatorConstants.kCubeMid+1)
                 .alongWith(new DriveCommand(drivetrain, driverController, 2))
                 .alongWith(new ArmMoveCommand(arm, 5250)));

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm;
@@ -13,9 +14,18 @@ public class ArmCommand extends CommandBase {
 
     private final Arm arm;
     private final Intake intake;
-    private final CommandXboxController auxController;
+    // private final CommandXboxController auxController;
+    private final CommandPS4Controller auxController;
 
-    public ArmCommand(Arm arm, Intake intake, CommandXboxController auxController) {
+    // public ArmCommand(Arm arm, Intake intake, CommandXboxController auxController) {
+    //     this.arm = arm;
+    //     this.auxController = auxController;
+    //     this.intake = intake;
+    //     addRequirements(arm);
+    //     addRequirements(intake);
+    // }
+
+    public ArmCommand(Arm arm, Intake intake, CommandPS4Controller auxController) {
         this.arm = arm;
         this.auxController = auxController;
         this.intake = intake;
